@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>숲속 병아리 - 마음 기록 & 응원 프로젝트</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:100%; height:100%; font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif; }
+  body { overflow:hidden; background:#8ec96f; }
+  button { font-family:inherit; cursor:pointer; }
+  input, textarea, select { font-family:inherit; }
+
+  /* ===== 공통 ===== */
+  .hidden { display:none !important; }
+  .card {
+    background:rgba(255,255,255,.92); border-radius:18px; padding:18px;
+    box-shadow:0 6px 20px rgba(40,80,30,.25);
+  }
+  .primaryBtn {
+    background:#4a9e3f; color:#fff; font-weight:800; border:none; border-radius:12px;
+    padding:12px 24px; font-size:16px; box-shadow:0 4px 0 #35762d; transition:transform .1s;
+  }
+  .primaryBtn:active { transform:translateY(3px); box-shadow:none; }
+  .primaryBtn:disabled { opacity:.5; cursor:default; }
+  .ghostBtn {
+    background:transparent; border:2px solid #4a9e3f; color:#2f6b28; font-weight:700;
+    border-radius:12px; padding:10px 20px; font-size:14px;
+  }
+
+  /* ===== 로그인 화면 ===== */
+  #loginScreen {
+    position:fixed; inset:0; z-index:100; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px; padding:20px;
+    background:linear-gradient(#cdeab0 0%, #a5d883 55%, #7cbb5e 100%);
+  }
+  #loginScreen .bigChick { font-size:72px; filter:drop-shadow(0 6px 6px rgba(0,0,0,.15)); animation:bob 2.4s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform:translateY(0);} 50% { transform:translateY(-8px);} }
+  #loginScreen h1 { color:#2f5d22; font-size:30px; letter-spacing:2px; text-shadow:0 2px 0 rgba(255,255,255,.5); }
+  #loginScreen .sub { color:#3f7030; font-size:14px; text-align:center; line-height:1.7; }
+  #loginCard { width:min(92vw, 360px); display:flex; flex-direction:column; gap:10px; }
+  #loginCard input {
+    padding:12px 14px; border-radius:10px; border:2px solid #bcd9a8; font-size:16px; outline:none; width:100%;
+  }
+  #loginCard input:focus { border-color:#4a9e3f; }
+  .tabRow { display:flex; gap:6px; margin-bottom:4px; }
+  .tabRow button {
+    flex:1; padding:10px; border:none; border-radius:10px; font-size:15px; font-weight:800;
+    background:#e4f0d8; color:#6d9459;
+  }
+  .tabRow button.on { background:#4a9e3f; color:#fff; }
+  .warnNote { font-size:12px; color:#8a6d3b; background:#fff6dd; border-radius:8px; padding:8px 10px; line-height:1.5; }
+  #loginErr { color:#c0392b; font-size:13px; font-weight:700; min-height:18px; text-align:center; }
+  .credit { position:absolute; bottom:12px; font-size:12px; color:#4f7d3e; }
+  #demoBadge {
+    position:absolute; top:12px; left:50%; transform:translateX(-50%);
+    background:#fff3c8; color:#8a6d3b; border:1px solid #e5c76b; border-radius:20px;
+    padding:6px 16px; font-size:12px; font-weight:700;
+  }
+
+  /* ===== 메인 화면 (숲) ===== */
+  #mainScreen { position:fixed; inset:0; overflow:hidden; }
+  #forestBg { position:absolute; inset:0; width:100%; height:100%; }
+
+  #topBar {
+    position:absolute; top:0; left:0; right:0; z-index:10;
+    display:flex; justify-content:space-between; align-items:center; padding:10px 14px; gap:8px;
+  }
+  #logoTag { background:rgba(255,255,255,.9); border-radius:14px; padding:8px 16px; font-weight:900; color:#2f5d22; font-size:16px; box-shadow:0 3px 10px rgba(40,80,30,.2); }
+  #userTag { display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.9); border-radius:14px; padding:6px 8px 6px 14px; font-size:13px; font-weight:700; color:#3f7030; box-shadow:0 3px 10px rgba(40,80,30,.2); }
+  #userTag button { background:#e4f0d8; border:none; border-radius:8px; padding:5px 10px; font-size:12px; color:#4a7a38; font-weight:700; }
+
+  /* 오늘의 과제 카드 */
+  #taskCard {
+    position:absolute; top:64px; left:12px; z-index:10; width:min(74vw, 250px);
+    background:rgba(255,255,255,.92); border-radius:14px; padding:12px 14px;
+    box-shadow:0 4px 14px rgba(40,80,30,.22); font-size:13px;
+  }
+  #taskCard h4 { color:#2f5d22; font-size:14px; margin-bottom:8px; }
+  .taskRow { display:flex; align-items:center; gap:6px; padding:4px 0; color:#456b37; font-weight:600; }
+  .taskRow.done { color:#9bb58c; text-decoration:line-through; }
+  #unlockGauge { margin-top:8px; font-size:12px; color:#6d9459; }
+  #gaugeBar { background:#e4f0d8; height:8px; border-radius:4px; overflow:hidden; margin-top:4px; }
+  #gaugeFill { height:100%; background:linear-gradient(90deg,#7cbb5e,#4a9e3f); border-radius:4px; transition:width .4s; }
+
+  /* 병아리 무대 */
+  #chickStage {
+    position:absolute; left:50%; top:52%; transform:translate(-50%,-50%); z-index:5;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  #chickSvg { width:min(58vw, 300px); height:auto; animation:bob 2.8s ease-in-out infinite; }
+  #chickShadow { width:60%; height:16px; background:rgba(30,60,20,.25); border-radius:50%; margin-top:-8px; filter:blur(3px); }
+  #chickHello {
+    background:rgba(255,255,255,.94); border-radius:14px; padding:8px 16px; margin-bottom:14px;
+    font-size:13px; font-weight:700; color:#3f7030; box-shadow:0 3px 10px rgba(40,80,30,.2);
+    max-width:70vw; text-align:center; line-height:1.5;
+  }
+
+  /* 하단 메뉴 */
+  #menuBar {
+    position:absolute; bottom:0; left:0; right:0; z-index:10;
+    display:flex; justify-content:center; gap:8px; padding:12px; flex-wrap:wrap;
+  }
+  .menuBtn {
+    background:rgba(255,255,255,.94); border:none; border-radius:14px; padding:10px 14px;
+    font-size:14px; font-weight:800; color:#2f5d22; box-shadow:0 4px 0 rgba(60,110,45,.5);
+  }
+  .menuBtn:active { transform:translateY(3px); box-shadow:none; }
+
+  /* 토스트 */
+  #toastBox { position:fixed; top:60px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:6px; align-items:center; pointer-events:none; }
+  .toast {
+    background:rgba(47,93,34,.94); color:#fff; border-radius:12px; padding:10px 22px;
+    font-size:14px; font-weight:700; box-shadow:0 4px 16px rgba(0,0,0,.3); animation:toastIn .3s;
+    max-width:88vw; text-align:center;
+  }
+  @keyframes toastIn { from { opacity:0; transform:translateY(-12px);} to { opacity:1; transform:none;} }
+
+  /* ===== 모달 공통 ===== */
+  .modal {
+    position:fixed; inset:0; z-index:120; background:rgba(20,40,15,.5);
+    display:none; align-items:center; justify-content:center; padding:16px;
+  }
+  .modal.open { display:flex; }
+  .modalCard {
+    background:#fdfff8; border-radius:18px; width:min(94vw, 430px); max-height:86vh;
+    overflow-y:auto; padding:20px; box-shadow:0 10px 30px rgba(0,0,0,.3);
+  }
+  .modalCard h3 { color:#2f5d22; font-size:18px; margin-bottom:12px; }
+  .closeX { float:right; background:none; border:none; font-size:18px; color:#666; }
+
+  /* 오늘 기록 모달 */
+  .moodRow { display:flex; gap:6px; justify-content:center; margin:10px 0 16px; flex-wrap:wrap; }
+  .moodBtn {
+    display:flex; flex-direction:column; align-items:center; gap:2px;
+    background:#f2f8ec; border:2px solid transparent; border-radius:12px; padding:8px 10px; font-size:12px; color:#456b37;
+  }
+  .moodBtn .em { font-size:26px; }
+  .moodBtn.sel { border-color:#4a9e3f; background:#e4f0d8; font-weight:800; }
+  #qBox { background:#eef6e4; border-left:4px solid #4a9e3f; border-radius:8px; padding:10px 12px; font-size:14px; color:#2f5d22; font-weight:700; line-height:1.6; }
+  #answerText {
+    width:100%; margin-top:10px; border:2px solid #bcd9a8; border-radius:10px; padding:10px;
+    font-size:15px; resize:none; outline:none; line-height:1.6;
+  }
+  #answerText:focus { border-color:#4a9e3f; }
+
+  /* 내 기록 */
+  .recItem { background:#f4f9ee; border-radius:12px; padding:12px 14px; margin-bottom:10px; font-size:14px; }
+  .recItem .rDate { font-weight:800; color:#2f5d22; }
+  .recItem .rQ { color:#6d9459; font-size:12px; margin-top:6px; }
+  .recItem .rA { color:#333; margin-top:2px; line-height:1.6; white-space:pre-wrap; }
+
+  /* 옷장 */
+  .closetGrid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .clItem {
+    background:#f2f8ec; border:2px solid #dcebcd; border-radius:12px; padding:10px 4px;
+    text-align:center; font-size:12px; color:#456b37; position:relative;
+  }
+  .clItem .em { font-size:28px; display:block; margin-bottom:2px; }
+  .clItem.locked { opacity:.55; }
+  .clItem.locked .em { filter:grayscale(1); }
+  .clItem.worn { border-color:#4a9e3f; background:#e4f0d8; font-weight:800; }
+  .clItem .wornTag { position:absolute; top:4px; right:6px; font-size:11px; }
+  .closetHint { font-size:12px; color:#8aa878; margin:8px 0 12px; line-height:1.6; }
+
+  /* 응원 게시판 */
+  .boardTop { display:flex; gap:8px; margin-bottom:12px; }
+  .boardTop select { flex:1; padding:9px; border-radius:10px; border:2px solid #bcd9a8; font-size:14px; outline:none; background:#fff; }
+  #cheerList { max-height:34vh; overflow-y:auto; display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+  .cheerItem { background:#f4f9ee; border-radius:12px; padding:10px 12px; font-size:14px; }
+  .cheerItem .dongBadge {
+    display:inline-block; background:#4a9e3f; color:#fff; font-size:11px; font-weight:800;
+    border-radius:10px; padding:2px 9px; margin-right:6px;
+  }
+  .cheerItem .cTime { float:right; font-size:11px; color:#9bb58c; }
+  .cheerItem .cMsg { margin-top:6px; color:#333; line-height:1.6; word-break:break-all; }
+  #cheerForm { border-top:2px dashed #dcebcd; padding-top:12px; }
+  #cheerForm .row { display:flex; gap:6px; margin-top:8px; }
+  #cheerMsg { flex:1; padding:10px; border-radius:10px; border:2px solid #bcd9a8; font-size:14px; outline:none; }
+  #cheerMsg:focus { border-color:#4a9e3f; }
+
+  /* 잠금해제 축하 모달 */
+  #unlockModal .modalCard { text-align:center; }
+  #unlockEmoji { font-size:64px; animation:pop .5s; display:block; margin:10px 0; }
+  @keyframes pop { 0% { transform:scale(0);} 70% { transform:scale(1.25);} 100% { transform:scale(1);} }
+  #unlockName { font-size:20px; font-weight:900; color:#2f5d22; margin-bottom:6px; }
+  #unlockDesc { font-size:13px; color:#6d9459; margin-bottom:16px; line-height:1.6; }
+
+  @media (max-width:480px) {
+    #taskCard { font-size:12px; width:min(64vw, 220px); }
+    .menuBtn { font-size:13px; padding:9px 11px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===================== 로그인 화면 ===================== -->
+<div id="loginScreen">
+  <div id="demoBadge" class="hidden">🔌 체험 모드 · Google Sheets 미연결 (설명서.md 참고)</div>
+  <div class="bigChick">🐥</div>
+  <h1>숲속 병아리</h1>
+  <p class="sub">매일 마음을 기록하고, 우리 동네에 응원을 남기면<br>병아리에게 입힐 수 있는 <b>새 옷</b>이 잠금해제돼요!</p>
+
+  <div class="card" id="loginCard">
+    <div class="tabRow">
+      <button id="tabLogin" class="on">로그인</button>
+      <button id="tabJoin">회원가입</button>
+    </div>
+    <input id="inId" type="text" maxlength="12" placeholder="아이디 (2~12자)" autocomplete="off">
+    <input id="inPw" type="password" maxlength="20" placeholder="비밀번호 (4자 이상)">
+    <input id="inPw2" type="password" maxlength="20" placeholder="비밀번호 확인" class="hidden">
+    <div class="warnNote hidden" id="joinNote">⚠️ 학교 프로젝트용 서비스예요. 실제로 쓰는 중요한 비밀번호는 입력하지 마세요!</div>
+    <div id="loginErr"></div>
+    <button class="primaryBtn" id="btnAuth">로그인</button>
+  </div>
+  <p class="credit">가온 팀 · 오현고 × 제주여고 합동 해커톤</p>
+</div>
+
+<!-- ===================== 메인 화면 ===================== -->
+<div id="mainScreen" class="hidden">
+
+  <!-- 숲 배경 -->
+  <svg id="forestBg" viewBox="0 0 800 600" preserveAspectRatio="xMidYMid slice">
+    <defs>
+      <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#d8efbe"/><stop offset="100%" stop-color="#a5d883"/>
+      </linearGradient>
+      <linearGradient id="groundG" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#8ec96f"/><stop offset="100%" stop-color="#5f9c47"/>
+      </linearGradient>
+    </defs>
+    <rect width="800" height="600" fill="url(#skyG)"/>
+    <!-- 햇살 -->
+    <circle cx="660" cy="80" r="46" fill="#fff8c9" opacity=".9"/>
+    <circle cx="660" cy="80" r="70" fill="#fff8c9" opacity=".35"/>
+    <!-- 멀리 있는 숲 (실루엣) -->
+    <g fill="#6aa653" opacity=".8">
+      <circle cx="60" cy="230" r="90"/><circle cx="180" cy="200" r="110"/><circle cx="330" cy="230" r="95"/>
+      <circle cx="500" cy="205" r="115"/><circle cx="650" cy="235" r="95"/><circle cx="780" cy="205" r="105"/>
+    </g>
+    <g fill="#578f43" opacity=".9">
+      <circle cx="0" cy="290" r="95"/><circle cx="130" cy="270" r="100"/><circle cx="290" cy="295" r="90"/>
+      <circle cx="430" cy="270" r="105"/><circle cx="590" cy="295" r="95"/><circle cx="740" cy="270" r="100"/>
+    </g>
+    <!-- 땅 -->
+    <rect y="330" width="800" height="270" fill="url(#groundG)"/>
+    <ellipse cx="400" cy="335" rx="520" ry="40" fill="#8ec96f"/>
+    <!-- 큰 나무들 (좌우) -->
+    <g>
+      <rect x="72" y="270" width="26" height="110" rx="10" fill="#7a5230"/>
+      <circle cx="85" cy="215" r="75" fill="#3e7a30"/><circle cx="45" cy="250" r="48" fill="#4a8c3a"/><circle cx="128" cy="248" r="50" fill="#4a8c3a"/>
+      <circle cx="70" cy="195" r="20" fill="#5da34a" opacity=".8"/>
+    </g>
+    <g>
+      <rect x="700" y="260" width="28" height="120" rx="10" fill="#7a5230"/>
+      <circle cx="714" cy="205" r="80" fill="#3e7a30"/><circle cx="668" cy="245" r="50" fill="#4a8c3a"/><circle cx="762" cy="240" r="52" fill="#4a8c3a"/>
+      <circle cx="738" cy="185" r="22" fill="#5da34a" opacity=".8"/>
+    </g>
+    <!-- 수풀/꽃 -->
+    <g fill="#4a8c3a">
+      <ellipse cx="180" cy="520" rx="70" ry="26"/><ellipse cx="620" cy="540" rx="80" ry="28"/>
+      <ellipse cx="60" cy="560" rx="60" ry="24"/><ellipse cx="740" cy="480" rx="55" ry="22"/>
+    </g>
+    <text x="150" y="512" font-size="20">🌼</text><text x="215" y="524" font-size="16">🌸</text>
+    <text x="590" y="534" font-size="20">🌷</text><text x="660" y="548" font-size="16">🌼</text>
+    <text x="300" y="565" font-size="18">🍄</text><text x="500" y="575" font-size="16">🌿</text>
+  </svg>
+
+  <div id="topBar">
+    <div id="logoTag">🌲 숲속 병아리</div>
+    <div id="userTag"><span id="userName"></span><button id="btnLogout">로그아웃</button></div>
+  </div>
+
+  <div id="taskCard">
+    <h4>🎯 오늘의 과제</h4>
+    <div id="taskList"></div>
+    <div id="unlockGauge">👗 옷 잠금해제 <b id="gaugeTxt">0/0</b>
+      <div id="gaugeBar"><div id="gaugeFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- 병아리 -->
+  <div id="chickStage">
+    <div id="chickHello">삐약! 오늘도 와 줬구나 🌱</div>
+    <svg id="chickSvg" viewBox="0 0 240 270">
+      <defs>
+        <radialGradient id="gBody" cx="50%" cy="38%" r="80%">
+          <stop offset="0%" stop-color="#ffe98c"/><stop offset="100%" stop-color="#ffce3d"/>
+        </radialGradient>
+      </defs>
+
+      <!-- 등 뒤 아이템 (몸보다 먼저 그려야 뒤로 보임) -->
+      <g class="item" id="it-wings" visibility="hidden">
+        <path d="M46 150 Q-8 112 14 62 Q38 92 50 118 Q28 86 42 52 Q62 88 64 128 Z" fill="#fff" stroke="#d8e4ec" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M194 150 Q248 112 226 62 Q202 92 190 118 Q212 86 198 52 Q178 88 176 128 Z" fill="#fff" stroke="#d8e4ec" stroke-width="3" stroke-linejoin="round"/>
+      </g>
+      <g class="item" id="it-cape" visibility="hidden">
+        <path d="M62 118 Q18 190 40 252 L92 240 Q64 185 74 126 Z" fill="#e74c3c" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M178 118 Q222 190 200 252 L148 240 Q176 185 166 126 Z" fill="#e74c3c" stroke="#c0392b" stroke-width="3" stroke-linejoin="round"/>
+      </g>
+
+      <!-- 발 -->
+      <ellipse cx="95" cy="243" rx="16" ry="9" fill="#f59e0b"/>
+      <ellipse cx="145" cy="243" rx="16" ry="9" fill="#f59e0b"/>
+
+      <!-- 몸통 (정면) -->
+      <ellipse cx="120" cy="150" rx="80" ry="85" fill="url(#gBody)" stroke="#e8b62a" stroke-width="3"/>
+      <!-- 배 -->
+      <ellipse cx="120" cy="188" rx="46" ry="34" fill="#fff3c2" opacity=".8"/>
+      <!-- 작은 날개 -->
+      <ellipse cx="45" cy="162" rx="15" ry="30" fill="#f5c62e" stroke="#e8b62a" stroke-width="2.5" transform="rotate(14 45 162)"/>
+      <ellipse cx="195" cy="162" rx="15" ry="30" fill="#f5c62e" stroke="#e8b62a" stroke-width="2.5" transform="rotate(-14 195 162)"/>
+      <!-- 머리 위 솜털 -->
+      <path d="M110 64 Q108 48 116 42 M120 62 Q120 44 127 40 M130 64 Q134 50 141 46" stroke="#e8b62a" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+      <!-- 얼굴 (정면 응시) -->
+      <circle cx="92" cy="122" r="9" fill="#3a2e20"/>
+      <circle cx="148" cy="122" r="9" fill="#3a2e20"/>
+      <circle cx="95" cy="118" r="3" fill="#fff"/>
+      <circle cx="151" cy="118" r="3" fill="#fff"/>
+      <ellipse cx="68" cy="150" rx="11" ry="7" fill="#ffb3a7" opacity=".75"/>
+      <ellipse cx="172" cy="150" rx="11" ry="7" fill="#ffb3a7" opacity=".75"/>
+      <polygon points="120,138 105,150 120,162 135,150" fill="#f59e0b" stroke="#d9820b" stroke-width="2" stroke-linejoin="round"/>
+      <line x1="107" y1="150" x2="133" y2="150" stroke="#c9760a" stroke-width="1.5"/>
+
+      <!-- 발 아이템 -->
+      <g class="item" id="it-boots" visibility="hidden">
+        <rect x="78" y="226" width="34" height="26" rx="9" fill="#d9534f" stroke="#b23c37" stroke-width="2.5"/>
+        <rect x="128" y="226" width="34" height="26" rx="9" fill="#d9534f" stroke="#b23c37" stroke-width="2.5"/>
+        <ellipse cx="95" cy="252" rx="18" ry="5" fill="#b23c37"/>
+        <ellipse cx="145" cy="252" rx="18" ry="5" fill="#b23c37"/>
+      </g>
+
+      <!-- 목 아이템 -->
+      <g class="item" id="it-scarf" visibility="hidden">
+        <path d="M52 176 Q120 212 188 176 L188 194 Q120 230 52 194 Z" fill="#e74c3c" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round"/>
+        <rect x="106" y="198" width="26" height="38" rx="7" fill="#e74c3c" stroke="#c0392b" stroke-width="2.5"/>
+        <path d="M110 236 L110 244 M119 236 L119 246 M128 236 L128 244" stroke="#c0392b" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <g class="item" id="it-bowtie" visibility="hidden">
+        <polygon points="118,184 92,170 92,198" fill="#4a90d9" stroke="#356fae" stroke-width="2.5" stroke-linejoin="round"/>
+        <polygon points="122,184 148,170 148,198" fill="#4a90d9" stroke="#356fae" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="120" cy="184" r="7" fill="#356fae"/>
+        <circle cx="100" cy="180" r="2.5" fill="#fff" opacity=".85"/><circle cx="104" cy="190" r="2.5" fill="#fff" opacity=".85"/>
+        <circle cx="140" cy="180" r="2.5" fill="#fff" opacity=".85"/><circle cx="136" cy="190" r="2.5" fill="#fff" opacity=".85"/>
+      </g>
+
+      <!-- 눈 아이템 -->
+      <g class="item" id="it-glasses" visibility="hidden">
+        <circle cx="92" cy="122" r="17" fill="rgba(255,255,255,.25)" stroke="#8a5a2b" stroke-width="4"/>
+        <circle cx="148" cy="122" r="17" fill="rgba(255,255,255,.25)" stroke="#8a5a2b" stroke-width="4"/>
+        <path d="M109 122 Q120 114 131 122" stroke="#8a5a2b" stroke-width="4" fill="none"/>
+        <line x1="75" y1="120" x2="62" y2="114" stroke="#8a5a2b" stroke-width="4" stroke-linecap="round"/>
+        <line x1="165" y1="120" x2="178" y2="114" stroke="#8a5a2b" stroke-width="4" stroke-linecap="round"/>
+      </g>
+      <g class="item" id="it-sunglasses" visibility="hidden">
+        <rect x="72" y="108" width="40" height="28" rx="10" fill="#23272e" stroke="#0f1216" stroke-width="2.5"/>
+        <rect x="128" y="108" width="40" height="28" rx="10" fill="#23272e" stroke="#0f1216" stroke-width="2.5"/>
+        <path d="M112 118 Q120 112 128 118" stroke="#0f1216" stroke-width="4" fill="none"/>
+        <path d="M80 115 Q88 111 96 114" stroke="#8fa3b8" stroke-width="3" fill="none" opacity=".8"/>
+        <path d="M136 115 Q144 111 152 114" stroke="#8fa3b8" stroke-width="3" fill="none" opacity=".8"/>
+      </g>
+
+      <!-- 머리 아이템 -->
+      <g class="item" id="it-strawhat" visibility="hidden">
+        <ellipse cx="120" cy="80" rx="58" ry="13" fill="#e8c96a" stroke="#c9a64b" stroke-width="2.5"/>
+        <path d="M88 78 Q88 42 120 42 Q152 42 152 78 Z" fill="#eed27a" stroke="#c9a64b" stroke-width="2.5"/>
+        <rect x="88" y="66" width="64" height="11" rx="4" fill="#d9534f"/>
+      </g>
+      <g class="item" id="it-ribbon" visibility="hidden">
+        <polygon points="76,76 50,60 56,90" fill="#f2545b" stroke="#d13a42" stroke-width="2.5" stroke-linejoin="round"/>
+        <polygon points="76,76 100,58 102,86" fill="#f2545b" stroke="#d13a42" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="77" cy="75" r="8" fill="#d13a42"/>
+      </g>
+      <g class="item" id="it-flowercrown" visibility="hidden">
+        <path d="M80 80 Q120 58 160 80" stroke="#5da34a" stroke-width="5" fill="none" stroke-linecap="round"/>
+        <text x="70" y="86" font-size="19" text-anchor="middle">🌸</text>
+        <text x="95" y="74" font-size="19" text-anchor="middle">🌼</text>
+        <text x="120" y="70" font-size="20" text-anchor="middle">🌸</text>
+        <text x="145" y="74" font-size="19" text-anchor="middle">🌼</text>
+        <text x="170" y="86" font-size="19" text-anchor="middle">🌸</text>
+      </g>
+      <g class="item" id="it-wizard" visibility="hidden">
+        <path d="M120 6 L86 82 L154 82 Z" fill="#6c4ac9" stroke="#55389f" stroke-width="3" stroke-linejoin="round"/>
+        <ellipse cx="120" cy="82" rx="46" ry="11" fill="#6c4ac9" stroke="#55389f" stroke-width="3"/>
+        <text x="120" y="60" font-size="17" text-anchor="middle">⭐</text>
+        <circle cx="106" cy="70" r="3" fill="#ffe98c"/><circle cx="136" cy="52" r="3" fill="#ffe98c"/>
+      </g>
+      <g class="item" id="it-crown" visibility="hidden">
+        <polygon points="88,82 88,52 103,66 120,44 137,66 152,52 152,82" fill="#f7c531" stroke="#d9a520" stroke-width="3" stroke-linejoin="round"/>
+        <circle cx="104" cy="74" r="4" fill="#e74c3c"/><circle cx="120" cy="72" r="4" fill="#4a90d9"/><circle cx="136" cy="74" r="4" fill="#2ecc71"/>
+      </g>
+    </svg>
+    <div id="chickShadow"></div>
+  </div>
+
+  <div id="menuBar">
+    <button class="menuBtn" id="btnRecord">✏️ 오늘 기록</button>
+    <button class="menuBtn" id="btnHistory">📖 내 기록</button>
+    <button class="menuBtn" id="btnCloset">👗 옷장</button>
+    <button class="menuBtn" id="btnBoard">📣 응원 게시판</button>
+  </div>
+</div>
+
+<div id="toastBox"></div>
+
+<!-- ===================== 오늘 기록 모달 ===================== -->
+<div class="modal" id="recordModal"><div class="modalCard">
+  <button class="closeX" data-close="recordModal">✕</button>
+  <h3>✏️ 오늘의 마음 기록</h3>
+  <p style="font-size:13px; color:#6d9459;">오늘 기분은 어때요?</p>
+  <div class="moodRow" id="moodRow"></div>
+  <div id="qBox"></div>
+  <textarea id="answerText" rows="4" maxlength="300" placeholder="천천히, 솔직하게 적어 보세요 (300자 이내)"></textarea>
+  <div style="text-align:right; margin-top:10px;">
+    <button class="primaryBtn" id="recordSubmit">기록하기</button>
+  </div>
+</div></div>
+
+<!-- ===================== 내 기록 모달 ===================== -->
+<div class="modal" id="historyModal"><div class="modalCard">
+  <button class="closeX" data-close="historyModal">✕</button>
+  <h3>📖 내 기록 보관함</h3>
+  <p style="font-size:12px; color:#8aa878; margin-bottom:12px;">이 기록은 <b>나만</b> 볼 수 있어요. 🔒</p>
+  <div id="historyList"></div>
+</div></div>
+
+<!-- ===================== 옷장 모달 ===================== -->
+<div class="modal" id="closetModal"><div class="modalCard">
+  <button class="closeX" data-close="closetModal">✕</button>
+  <h3>👗 병아리 옷장</h3>
+  <p class="closetHint">과제를 완료할 때마다 옷이 하나씩 잠금해제돼요.<br>잠금해제된 옷을 눌러 입히거나 벗길 수 있어요.</p>
+  <div class="closetGrid" id="closetGrid"></div>
+</div></div>
+
+<!-- ===================== 응원 게시판 모달 ===================== -->
+<div class="modal" id="boardModal"><div class="modalCard">
+  <button class="closeX" data-close="boardModal">✕</button>
+  <h3>📣 제주 동네별 응원 게시판</h3>
+  <p style="font-size:12px; color:#8aa878; margin-bottom:10px;">모두가 함께 보는 <b>익명</b> 게시판이에요. 누가 썼는지는 아무도 몰라요!</p>
+  <div class="boardTop">
+    <select id="dongFilter"></select>
+    <button class="ghostBtn" id="btnRefreshBoard" style="padding:6px 14px;">🔄</button>
+  </div>
+  <div id="cheerList"></div>
+  <div id="cheerForm">
+    <b style="font-size:13px; color:#2f5d22;">💌 익명 응원 남기기</b>
+    <div class="row">
+      <select id="dongSelect" style="width:110px; padding:8px; border-radius:10px; border:2px solid #bcd9a8;"></select>
+      <input id="cheerMsg" type="text" maxlength="80" placeholder="따뜻한 한마디 (80자 이내)" autocomplete="off">
+    </div>
+    <div style="text-align:right; margin-top:8px;">
+      <button class="primaryBtn" id="cheerSubmit" style="padding:9px 20px; font-size:14px;">남기기</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ===================== 잠금해제 축하 모달 ===================== -->
+<div class="modal" id="unlockModal"><div class="modalCard">
+  <h3 style="text-align:center;">🎉 새 옷 잠금해제!</h3>
+  <span id="unlockEmoji">🎀</span>
+  <div id="unlockName"></div>
+  <div id="unlockDesc"></div>
+  <div style="display:flex; gap:8px; justify-content:center;">
+    <button class="primaryBtn" id="unlockWear">바로 입기</button>
+    <button class="ghostBtn" data-close="unlockModal">옷장에 두기</button>
+  </div>
+</div></div>
+
+<script>
+'use strict';
+/* =========================================================
+   숲속 병아리 - 가온 팀 해커톤
+   - 과제 완료 → 병아리 옷 잠금해제 (자발성 UP!)
+   - Google Sheets + Apps Script 로그인/기록/응원 게시판
+   - API_URL이 비어 있으면 "체험 모드"(localStorage)로 동작
+   설정 방법은 설명서.md 참고!
+========================================================= */
+
+// ★★★ 설명서.md대로 Apps Script를 배포한 뒤, 웹 앱 URL을 여기에 붙여넣으세요 ★★★
+const API_URL = 'https://script.google.com/macros/s/AKfycbxxSInztetsrMqVRYvjf386GL_qu4788QZAhXsl-1QC1qpKFObk3v6dRSbZ1WwUBXVoYQ/exec';
+// 예시: const API_URL = 'https://script.google.com/macros/s/AKfyc.../exec';
+
+// ---------- 데이터 정의 ----------
+// 옷 아이템: 위에서부터 순서대로 잠금해제됩니다.
+// cat(부위)이 같은 옷은 동시에 입을 수 없어요. (head/eyes/neck/back/feet)
+const ITEMS = [
+  { id:'ribbon',      name:'빨간 리본',    cat:'head', emoji:'🎀', desc:'첫걸음을 축하하는 깜찍한 리본!' },
+  { id:'strawhat',    name:'밀짚모자',     cat:'head', emoji:'👒', desc:'숲 산책에 딱 좋은 시원한 모자.' },
+  { id:'glasses',     name:'동그란 안경',  cat:'eyes', emoji:'👓', desc:'왠지 똑똑해 보이는 안경.' },
+  { id:'bowtie',      name:'나비넥타이',   cat:'neck', emoji:'🦋', desc:'오늘은 좀 격식 있게, 삐약.' },
+  { id:'flowercrown', name:'꽃 왕관',      cat:'head', emoji:'🌸', desc:'숲의 꽃으로 엮은 향기로운 왕관.' },
+  { id:'scarf',       name:'포근 목도리',  cat:'neck', emoji:'🧣', desc:'마음까지 따뜻해지는 목도리.' },
+  { id:'sunglasses',  name:'선글라스',     cat:'eyes', emoji:'🕶️', desc:'숲에서 제일 멋진 병아리 등장.' },
+  { id:'boots',       name:'빨간 장화',    cat:'feet', emoji:'👢', desc:'비 오는 날에도 신나게 첨벙!' },
+  { id:'cape',        name:'히어로 망토',  cat:'back', emoji:'🦸', desc:'꾸준함이야말로 진짜 초능력.' },
+  { id:'wizard',      name:'마법사 모자',  cat:'head', emoji:'🧙', desc:'기록의 마법을 부리는 자의 모자.' },
+  { id:'crown',       name:'황금 왕관',    cat:'head', emoji:'👑', desc:'꾸준히 기록한 자에게 왕관을.' },
+  { id:'wings',       name:'천사 날개',    cat:'back', emoji:'🕊️', desc:'모든 옷을 모은 전설의 병아리!' }
+];
+
+const MOODS = [
+  { e:'😄', t:'좋아요' }, { e:'🙂', t:'괜찮아요' }, { e:'😐', t:'그저 그래요' },
+  { e:'😢', t:'힘들어요' }, { e:'😠', t:'화나요' }
+];
+
+// 매일 날짜에 따라 하나씩 돌아가며 나오는 질문
+const QUESTIONS = [
+  '오늘 나를 웃게 만든 것은 무엇이었나요?',
+  '지금 가장 하고 싶은 일은 무엇인가요?',
+  '오늘 가장 고마웠던 사람은 누구인가요?',
+  '요즘 나를 힘들게 하는 것이 있다면 무엇인가요?',
+  '내일의 나에게 한마디를 남긴다면?',
+  '오늘 새롭게 알게 된 것이 있나요?',
+  '최근에 들었던 말 중 기억에 남는 말은?',
+  '지금 내 마음의 날씨를 표현한다면 어떤 날씨인가요?',
+  '나의 장점을 하나만 자랑해 본다면?',
+  '요즘 제일 좋아하는 노래나 영상은 무엇인가요?',
+  '오늘 나에게 칭찬 한마디를 해 준다면?',
+  '10년 뒤의 나는 어떤 모습이면 좋겠나요?',
+  '요즘 가장 기대되는 일은 무엇인가요?',
+  '오늘 하루 중 가장 평화로웠던 순간은 언제였나요?',
+  '친구에게 추천하고 싶은 것이 하나 있다면?'
+];
+
+// 제주 동네 목록 (응원 게시판)
+const DONGS = ['제주시내','애월','한림','한경','대정','안덕','중문','서귀포시내','남원','표선','성산','구좌','조천','우도','추자'];
+
+// ---------- 유틸 ----------
+const $ = id => document.getElementById(id);
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function nowStr(){
+  const d = new Date();
+  return String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0')
+    + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function todaysQuestion(){
+  const d = new Date();
+  const idx = (d.getFullYear()*372 + d.getMonth()*31 + d.getDate()) % QUESTIONS.length;
+  return QUESTIONS[idx];
+}
+function escapeHtml(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function toast(msg, ms){
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  $('toastBox').appendChild(el);
+  setTimeout(()=>{ el.style.opacity = '0'; el.style.transition = 'opacity .4s'; }, ms || 2600);
+  setTimeout(()=> el.remove(), (ms || 2600) + 500);
+}
+
+// ---------- 상태 ----------
+let session = null;   // { id, pw }
+let progress = { unlocked:0, worn:[], lastRecordDate:'', lastCheerDate:'' };
+let selectedMood = null;
+let pendingUnlockItem = null;
+const SESSION_KEY = 'chick_session_v1';
+
+// ---------- API (Google Apps Script 통신) ----------
+async function api(action, data){
+  if(!API_URL) return demoApi(action, data || {});
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      body: JSON.stringify({ action, ...data })
+    });
+    return await res.json();
+  } catch(err){
+    return { ok:false, error:'서버에 연결할 수 없어요. 인터넷 또는 API_URL 설정을 확인해 주세요.' };
+  }
+}
+
+// ---------- 체험 모드 (API_URL이 비었을 때 localStorage로 동작) ----------
+const DEMO_KEY = 'chick_demo_db_v1';
+function loadDemo(){
+  try {
+    const raw = localStorage.getItem(DEMO_KEY);
+    if(raw) return JSON.parse(raw);
+  } catch(e){}
+  // 처음이면 샘플 응원을 채워 둔다
+  return { users:{}, board:[
+    { time:'07/22 17:40', dong:'애월',      msg:'애월 바닷바람처럼 시원한 하루 보내세요!' },
+    { time:'07/22 19:12', dong:'제주시내',  msg:'시험 기간 다들 힘내요. 끝나고 맛있는 거 먹자!' },
+    { time:'07/23 08:30', dong:'성산',      msg:'오늘 일출 진짜 예뻤어요. 좋은 일 생길 듯!' },
+    { time:'07/23 21:05', dong:'서귀포시내','msg':'힘든 날도 있지만, 내일은 내일의 귤이 익는다 🍊' }
+  ] };
+}
+function saveDemo(db){ try { localStorage.setItem(DEMO_KEY, JSON.stringify(db)); } catch(e){} }
+
+async function demoApi(action, d){
+  const db = loadDemo();
+  const auth = ()=>{
+    const u = db.users[d.id];
+    if(!u) throw '존재하지 않는 아이디예요.';
+    if(u.pw !== d.pw) throw '비밀번호가 일치하지 않아요.';
+    return u;
+  };
+  try {
+    switch(action){
+      case 'register': {
+        if(db.users[d.id]) return { ok:false, error:'이미 사용 중인 아이디예요.' };
+        db.users[d.id] = { pw:d.pw, progress:{ unlocked:0, worn:[], lastRecordDate:'', lastCheerDate:'' }, records:[] };
+        saveDemo(db);
+        return { ok:true, progress: db.users[d.id].progress };
+      }
+      case 'login': {
+        const u = auth();
+        return { ok:true, progress: u.progress };
+      }
+      case 'saveRecord': {
+        const u = auth();
+        u.records.push({ date:d.date, mood:d.mood, question:d.question, answer:d.answer });
+        saveDemo(db);
+        return { ok:true };
+      }
+      case 'getRecords': {
+        const u = auth();
+        return { ok:true, records: u.records };
+      }
+      case 'saveProgress': {
+        const u = auth();
+        u.progress = { unlocked:d.unlocked, worn:d.worn, lastRecordDate:d.lastRecordDate, lastCheerDate:d.lastCheerDate };
+        saveDemo(db);
+        return { ok:true };
+      }
+      case 'addCheer': {
+        auth(); // 로그인한 사람만 쓸 수 있지만, 누가 썼는지는 저장하지 않음 (익명!)
+        db.board.push({ time:nowStr(), dong:d.dong, msg:d.message });
+        saveDemo(db);
+        return { ok:true };
+      }
+      case 'getCheers': {
+        auth();
+        return { ok:true, cheers: db.board.slice(-100).reverse() };
+      }
+    }
+    return { ok:false, error:'알 수 없는 요청이에요.' };
+  } catch(err){
+    return { ok:false, error:String(err) };
+  }
+}
+
+// ---------- 로그인 화면 ----------
+let joinMode = false;
+function setJoinMode(on){
+  joinMode = on;
+  $('tabLogin').classList.toggle('on', !on);
+  $('tabJoin').classList.toggle('on', on);
+  $('inPw2').classList.toggle('hidden', !on);
+  $('joinNote').classList.toggle('hidden', !on);
+  $('btnAuth').textContent = on ? '회원가입' : '로그인';
+  $('loginErr').textContent = '';
+}
+$('tabLogin').onclick = ()=> setJoinMode(false);
+$('tabJoin').onclick = ()=> setJoinMode(true);
+
+async function doAuth(){
+  const id = $('inId').value.trim();
+  const pw = $('inPw').value;
+  const err = $('loginErr');
+  err.textContent = '';
+
+  if(!/^[a-zA-Z0-9가-힣_]{2,12}$/.test(id)){ err.textContent = '아이디는 2~12자 (한글/영문/숫자/_)로 입력해 주세요.'; return; }
+  if(pw.length < 4){ err.textContent = '비밀번호는 4자 이상이어야 해요.'; return; }
+  if(joinMode && pw !== $('inPw2').value){ err.textContent = '비밀번호 확인이 일치하지 않아요.'; return; }
+
+  const btn = $('btnAuth');
+  btn.disabled = true;
+  btn.textContent = '확인 중...';
+  const res = await api(joinMode ? 'register' : 'login', { id, pw });
+  btn.disabled = false;
+  btn.textContent = joinMode ? '회원가입' : '로그인';
+
+  if(!res.ok){ err.textContent = res.error || '오류가 발생했어요.'; return; }
+
+  session = { id, pw };
+  progress = normalizeProgress(res.progress);
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch(e){}
+  enterMain(joinMode);
+}
+$('btnAuth').onclick = doAuth;
+$('inPw').addEventListener('keydown', e=>{ if(e.key==='Enter' && !joinMode) doAuth(); });
+$('inPw2').addEventListener('keydown', e=>{ if(e.key==='Enter') doAuth(); });
+
+function normalizeProgress(p){
+  p = p || {};
+  return {
+    unlocked: Math.min(ITEMS.length, Number(p.unlocked) || 0),
+    worn: Array.isArray(p.worn) ? p.worn.filter(w => ITEMS.some(i=>i.id===w)) : [],
+    lastRecordDate: String(p.lastRecordDate || ''),
+    lastCheerDate: String(p.lastCheerDate || '')
+  };
+}
+
+// 자동 로그인 시도
+(async function autoLogin(){
+  if(!API_URL) $('demoBadge').classList.remove('hidden');
+  let saved = null;
+  try { saved = JSON.parse(localStorage.getItem(SESSION_KEY)); } catch(e){}
+  if(!saved || !saved.id) return;
+  const res = await api('login', saved);
+  if(res.ok){
+    session = saved;
+    progress = normalizeProgress(res.progress);
+    enterMain(false);
+  }
+})();
+
+// ---------- 메인 화면 ----------
+function enterMain(isNew){
+  $('loginScreen').classList.add('hidden');
+  $('mainScreen').classList.remove('hidden');
+  $('userName').textContent = '🐥 ' + session.id;
+  renderAll();
+  $('chickHello').textContent = isNew
+    ? '삐약! 처음 만났네. 과제를 하면 나한테 옷을 입혀 줄 수 있어!'
+    : '삐약! ' + session.id + ' 님, 다시 와 줬구나 🌱';
+}
+
+$('btnLogout').onclick = ()=>{
+  if(!confirm('로그아웃할까요?')) return;
+  try { localStorage.removeItem(SESSION_KEY); } catch(e){}
+  location.reload();
+};
+
+function renderAll(){
+  renderTasks();
+  renderChick();
+}
+
+// ---------- 오늘의 과제 ----------
+function taskStates(){
+  const t = todayStr();
+  return [
+    { key:'record', name:'오늘의 마음 기록하기', done: progress.lastRecordDate === t },
+    { key:'cheer',  name:'우리 동네에 응원 남기기', done: progress.lastCheerDate === t }
+  ];
+}
+function renderTasks(){
+  const box = $('taskList');
+  box.innerHTML = '';
+  taskStates().forEach(t=>{
+    const el = document.createElement('div');
+    el.className = 'taskRow' + (t.done ? ' done' : '');
+    el.textContent = (t.done ? '✅ ' : '⬜ ') + t.name;
+    box.appendChild(el);
+  });
+  $('gaugeTxt').textContent = progress.unlocked + '/' + ITEMS.length;
+  $('gaugeFill').style.width = (progress.unlocked / ITEMS.length * 100) + '%';
+}
+
+// 과제 완료 처리: 오늘 처음 완료한 과제라면 옷 1개 잠금해제
+function completeTask(key){
+  const t = todayStr();
+  const field = key === 'record' ? 'lastRecordDate' : 'lastCheerDate';
+  if(progress[field] === t) return null; // 오늘 이미 완료한 과제
+  progress[field] = t;
+  if(progress.unlocked < ITEMS.length){
+    progress.unlocked += 1;
+    return ITEMS[progress.unlocked - 1];
+  }
+  return null;
+}
+
+async function pushProgress(){
+  const res = await api('saveProgress', {
+    id: session.id, pw: session.pw,
+    unlocked: progress.unlocked, worn: progress.worn,
+    lastRecordDate: progress.lastRecordDate, lastCheerDate: progress.lastCheerDate
+  });
+  if(!res.ok) toast('⚠️ 저장 실패: ' + (res.error || '알 수 없는 오류'));
+}
+
+function showUnlock(item){
+  pendingUnlockItem = item;
+  $('unlockEmoji').textContent = item.emoji;
+  $('unlockName').textContent = item.name;
+  $('unlockDesc').textContent = item.desc;
+  openModal('unlockModal');
+}
+$('unlockWear').onclick = ()=>{
+  if(pendingUnlockItem) wearItem(pendingUnlockItem.id, true);
+  closeModal('unlockModal');
+};
+
+// ---------- 병아리 옷 입히기 ----------
+function renderChick(){
+  ITEMS.forEach(it=>{
+    const g = $('it-' + it.id);
+    if(g) g.setAttribute('visibility', progress.worn.includes(it.id) ? 'visible' : 'hidden');
+  });
+}
+function wearItem(id, forceOn){
+  const item = ITEMS.find(i=>i.id===id);
+  if(!item) return;
+  const already = progress.worn.includes(id);
+  if(already && !forceOn){
+    progress.worn = progress.worn.filter(w => w !== id);           // 벗기
+  } else {
+    progress.worn = progress.worn.filter(w => {                    // 같은 부위 옷은 교체
+      const other = ITEMS.find(i=>i.id===w);
+      return other && other.cat !== item.cat;
+    });
+    progress.worn.push(id);
+  }
+  renderChick();
+  renderCloset();
+  pushProgress();
+}
+
+// ---------- 옷장 ----------
+function renderCloset(){
+  const g = $('closetGrid');
+  g.innerHTML = '';
+  ITEMS.forEach((it, i)=>{
+    const unlocked = i < progress.unlocked;
+    const worn = progress.worn.includes(it.id);
+    const el = document.createElement('button');
+    el.className = 'clItem' + (unlocked ? '' : ' locked') + (worn ? ' worn' : '');
+    el.innerHTML = '<span class="em">' + (unlocked ? it.emoji : '🔒') + '</span>'
+      + it.name + (worn ? '<span class="wornTag">✔</span>' : '');
+    el.title = unlocked ? it.desc : '과제를 완료하면 잠금해제돼요!';
+    el.onclick = ()=>{
+      if(!unlocked){ toast('🔒 아직 잠겨 있어요. 오늘의 과제를 완료해 보세요!'); return; }
+      wearItem(it.id);
+    };
+    g.appendChild(el);
+  });
+}
+$('btnCloset').onclick = ()=>{ renderCloset(); openModal('closetModal'); };
+
+// ---------- 오늘 기록 ----------
+function renderMoodRow(){
+  const row = $('moodRow');
+  row.innerHTML = '';
+  MOODS.forEach(m=>{
+    const b = document.createElement('button');
+    b.className = 'moodBtn' + (selectedMood === m ? ' sel' : '');
+    b.innerHTML = '<span class="em">' + m.e + '</span>' + m.t;
+    b.onclick = ()=>{ selectedMood = m; renderMoodRow(); };
+    row.appendChild(b);
+  });
+}
+$('btnRecord').onclick = ()=>{
+  selectedMood = null;
+  renderMoodRow();
+  $('qBox').textContent = '💭 오늘의 질문: ' + todaysQuestion();
+  $('answerText').value = '';
+  openModal('recordModal');
+};
+$('recordSubmit').onclick = async ()=>{
+  if(!selectedMood){ toast('오늘의 기분을 먼저 골라 주세요!'); return; }
+  const answer = $('answerText').value.trim();
+  if(!answer){ toast('질문에 대한 답을 적어 주세요!'); return; }
+
+  const btn = $('recordSubmit');
+  btn.disabled = true;
+  const res = await api('saveRecord', {
+    id: session.id, pw: session.pw,
+    date: todayStr(), mood: selectedMood.e + ' ' + selectedMood.t,
+    question: todaysQuestion(), answer
+  });
+  btn.disabled = false;
+  if(!res.ok){ toast('⚠️ 저장 실패: ' + (res.error || '오류')); return; }
+
+  closeModal('recordModal');
+  const item = completeTask('record');
+  renderTasks();
+  await pushProgress();
+  if(item) showUnlock(item);
+  else toast('📝 오늘의 마음이 기록되었어요!');
+  $('chickHello').textContent = '삐약! 오늘의 마음, 잘 들었어 ' + selectedMood.e;
+};
+
+// ---------- 내 기록 ----------
+$('btnHistory').onclick = async ()=>{
+  const box = $('historyList');
+  box.innerHTML = '<p style="color:#8aa878; font-size:13px;">불러오는 중...</p>';
+  openModal('historyModal');
+  const res = await api('getRecords', { id: session.id, pw: session.pw });
+  if(!res.ok){ box.innerHTML = '<p style="color:#c0392b; font-size:13px;">⚠️ ' + escapeHtml(res.error || '불러오기 실패') + '</p>'; return; }
+  const records = (res.records || []).slice().reverse(); // 최신순
+  if(!records.length){
+    box.innerHTML = '<p style="color:#8aa878; font-size:13px;">아직 기록이 없어요. 첫 기록을 남겨 보세요!</p>';
+    return;
+  }
+  box.innerHTML = '';
+  records.forEach(r=>{
+    const el = document.createElement('div');
+    el.className = 'recItem';
+    el.innerHTML = '<span class="rDate">' + escapeHtml(r.date) + '</span> · ' + escapeHtml(r.mood)
+      + '<div class="rQ">💭 ' + escapeHtml(r.question) + '</div>'
+      + '<div class="rA">' + escapeHtml(r.answer) + '</div>';
+    box.appendChild(el);
+  });
+};
+
+// ---------- 응원 게시판 ----------
+function initDongSelects(){
+  const filter = $('dongFilter');
+  filter.innerHTML = '<option value="">🗺️ 전체 동네 보기</option>';
+  const sel = $('dongSelect');
+  sel.innerHTML = '';
+  DONGS.forEach(d=>{
+    filter.insertAdjacentHTML('beforeend', '<option value="' + d + '">' + d + '</option>');
+    sel.insertAdjacentHTML('beforeend', '<option value="' + d + '">' + d + '</option>');
+  });
+}
+initDongSelects();
+
+let allCheers = [];
+async function loadBoard(){
+  const box = $('cheerList');
+  box.innerHTML = '<p style="color:#8aa878; font-size:13px;">불러오는 중...</p>';
+  const res = await api('getCheers', { id: session.id, pw: session.pw });
+  if(!res.ok){ box.innerHTML = '<p style="color:#c0392b; font-size:13px;">⚠️ ' + escapeHtml(res.error || '불러오기 실패') + '</p>'; return; }
+  allCheers = res.cheers || [];
+  renderBoard();
+}
+function renderBoard(){
+  const box = $('cheerList');
+  const f = $('dongFilter').value;
+  const list = f ? allCheers.filter(c => c.dong === f) : allCheers;
+  if(!list.length){
+    box.innerHTML = '<p style="color:#8aa878; font-size:13px;">아직 응원이 없어요. 첫 응원을 남겨 보세요! 💌</p>';
+    return;
+  }
+  box.innerHTML = '';
+  list.forEach(c=>{
+    const el = document.createElement('div');
+    el.className = 'cheerItem';
+    el.innerHTML = '<span class="dongBadge">' + escapeHtml(c.dong) + '</span>'
+      + '<span class="cTime">' + escapeHtml(c.time || '') + '</span>'
+      + '<div class="cMsg">' + escapeHtml(c.msg) + '</div>';
+    box.appendChild(el);
+  });
+}
+$('btnBoard').onclick = ()=>{ openModal('boardModal'); loadBoard(); };
+$('btnRefreshBoard').onclick = loadBoard;
+$('dongFilter').onchange = renderBoard;
+
+$('cheerSubmit').onclick = async ()=>{
+  const dong = $('dongSelect').value;
+  const message = $('cheerMsg').value.trim();
+  if(!message){ toast('응원 메시지를 입력해 주세요!'); return; }
+
+  const btn = $('cheerSubmit');
+  btn.disabled = true;
+  const res = await api('addCheer', { id: session.id, pw: session.pw, dong, message });
+  btn.disabled = false;
+  if(!res.ok){ toast('⚠️ 등록 실패: ' + (res.error || '오류')); return; }
+
+  $('cheerMsg').value = '';
+  toast('💌 ' + dong + ' 동네에 익명 응원을 남겼어요!');
+  await loadBoard();
+
+  const item = completeTask('cheer');
+  renderTasks();
+  await pushProgress();
+  if(item){ closeModal('boardModal'); showUnlock(item); }
+};
+
+// ---------- 모달 공통 ----------
+function openModal(id){ $(id).classList.add('open'); }
+function closeModal(id){ $(id).classList.remove('open'); }
+document.querySelectorAll('[data-close]').forEach(b=>{
+  b.onclick = ()=> closeModal(b.dataset.close);
+});
+document.querySelectorAll('.modal').forEach(m=>{
+  m.addEventListener('click', e=>{ if(e.target === m) m.classList.remove('open'); });
+});
+</script>
+</body>
+</html>
