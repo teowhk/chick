@@ -10,9 +10,9 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
 /* ===========================================================
-   숲속 병아리 발표자료
+   숲속 병아리 발표자료 · CORE팀
    시그니처: 모든 슬라이드 아래로 이어지는 하나의 숲 지평선.
-   병아리가 그 위를 걸어가는 만큼이 발표 진행률이다.
+   병아리가 그 위를 걸어간 만큼이 발표 진행률이다.
    =========================================================== */
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -23,8 +23,7 @@
   --pad: clamp(28px, 5.5vw, 96px);
 }
 
-/* 슬라이드 흐름에 따라 하늘빛이 바뀐다.
-   문제(dawn) → 해결(day) → 마무리(dusk) */
+/* 하늘빛이 이야기를 따라간다. 문제(dawn) → 서비스(day) → 마무리(dusk) */
 body[data-mood="dawn"]{
   --sky1:#e9edea; --sky2:#c4cfc7; --hill-far:#95a998; --hill-near:#74907b;
   --ground:#6b8672; --ink:#28312a; --ink-soft:#5b6a5e; --line:#b6c2b8; --card:rgba(255,255,255,.5);
@@ -47,7 +46,7 @@ body{
   overflow:hidden;
 }
 
-/* ---------- 지평선 (모든 슬라이드 공통, 고정) ---------- */
+/* ---------- 지평선 ---------- */
 #horizon{position:fixed;left:0;right:0;bottom:0;height:clamp(120px,20vh,190px);pointer-events:none;z-index:2}
 #horizon svg{position:absolute;inset:0;width:100%;height:100%}
 .hillFar{fill:var(--hill-far);transition:fill .8s ease}
@@ -75,13 +74,11 @@ body{
   display:flex;flex-direction:column;justify-content:center;
   padding:var(--pad);
   padding-bottom:clamp(150px,24vh,220px);
-  opacity:0;visibility:hidden;pointer-events:none;
-  z-index:1;
+  opacity:0;visibility:hidden;pointer-events:none;z-index:1;
 }
 .slide.on{opacity:1;visibility:visible;pointer-events:auto;z-index:3}
 .wrap{width:min(1140px,100%);margin:0 auto}
 
-/* 등장 순서 */
 .slide.on .rise{animation:rise .55s cubic-bezier(.2,.7,.3,1) backwards}
 .slide.on .rise:nth-child(1){animation-delay:.03s}
 .slide.on .rise:nth-child(2){animation-delay:.10s}
@@ -98,33 +95,20 @@ body{
 }
 .eyebrow::before{content:"";width:26px;height:2px;background:currentColor;opacity:.55}
 
-h1{
-  font-family:'Gowun Batang',serif;font-weight:700;
-  font-size:clamp(46px,8.6vw,124px);line-height:1.02;letter-spacing:-.02em;
-}
-h2{
-  font-family:'Gowun Batang',serif;font-weight:700;
-  font-size:clamp(29px,4.4vw,60px);line-height:1.24;letter-spacing:-.015em;
-}
+h1{font-family:'Gowun Batang',serif;font-weight:700;font-size:clamp(46px,8.6vw,124px);line-height:1.02;letter-spacing:-.02em}
+h2{font-family:'Gowun Batang',serif;font-weight:700;font-size:clamp(28px,4.3vw,58px);line-height:1.24;letter-spacing:-.015em}
 h2 em{font-style:normal;color:var(--moss);position:relative;white-space:nowrap}
-h2 em::after{
-  content:"";position:absolute;left:0;right:0;bottom:.06em;height:.34em;
-  background:var(--chick);opacity:.4;border-radius:3px;z-index:-1;
-}
+h2 em::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.34em;background:var(--chick);opacity:.4;border-radius:3px;z-index:-1}
 .lead{font-size:clamp(16px,1.7vw,22px);line-height:1.75;color:var(--ink-soft);max-width:62ch}
-.sub{font-size:clamp(15px,1.5vw,19px);color:var(--ink-soft);line-height:1.7}
+.sub{font-size:clamp(14.5px,1.45vw,19px);color:var(--ink-soft);line-height:1.7}
 .note{font-size:clamp(11px,1vw,13.5px);color:var(--ink-soft);opacity:.75;line-height:1.65}
 
 .mt-s{margin-top:clamp(12px,1.8vh,20px)}
 .mt-m{margin-top:clamp(20px,3.2vh,38px)}
-.mt-l{margin-top:clamp(30px,4.6vh,56px)}
+.mt-l{margin-top:clamp(28px,4.4vh,54px)}
 
 /* ---------- 표지 ---------- */
-.cover-team{
-  display:inline-flex;align-items:center;gap:10px;
-  font-size:clamp(13px,1.3vw,16px);font-weight:700;letter-spacing:.14em;
-  background:var(--ink);color:#fdfbe9;padding:9px 18px;border-radius:999px;
-}
+.cover-team{display:inline-flex;align-items:center;gap:10px;font-size:clamp(13px,1.3vw,16px);font-weight:700;letter-spacing:.14em;background:var(--ink);color:#fdfbe9;padding:9px 18px;border-radius:999px}
 .cover-sub{font-size:clamp(17px,2vw,27px);font-weight:600;color:var(--ink-soft);margin-top:clamp(16px,2.4vh,26px)}
 .cover-line{font-family:'Gowun Batang',serif;font-size:clamp(18px,2.1vw,26px);color:var(--ink);margin-top:clamp(22px,3.4vh,40px);opacity:.85}
 
@@ -137,36 +121,19 @@ h2 em::after{
 .stat .src{margin-top:6px;font-size:clamp(10px,.92vw,12.5px);color:var(--ink-soft);opacity:.8}
 .stat.hot .num{color:var(--ribbon)}
 
-/* ---------- 카드/리스트 ---------- */
+/* ---------- 카드 ---------- */
 .cards{display:grid;gap:clamp(12px,1.6vw,20px)}
 .c3{grid-template-columns:repeat(3,1fr)}
 .c2{grid-template-columns:repeat(2,1fr)}
-.card{
-  background:var(--card);border:1px solid var(--line);border-radius:18px;
-  padding:clamp(16px,2.2vw,26px);backdrop-filter:blur(3px);
-}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(16px,2.2vw,26px);backdrop-filter:blur(3px)}
 .card .k{font-size:clamp(15px,1.55vw,20px);font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:9px}
 .card .v{font-size:clamp(13.5px,1.32vw,17px);line-height:1.65;color:var(--ink-soft)}
-.chip{
-  display:inline-block;font-size:clamp(11.5px,1.05vw,14px);font-weight:700;
-  border:1.5px solid var(--ink);border-radius:999px;padding:5px 13px;margin:0 8px 8px 0;
-}
+.chip{display:inline-block;font-size:clamp(11.5px,1.05vw,14px);font-weight:700;border:1.5px solid var(--ink);border-radius:999px;padding:5px 13px;margin:0 8px 8px 0}
 
-/* 말풍선(못 하는 말) */
+/* 말풍선 */
 .quotes{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(12px,1.6vw,20px)}
-.quote{
-  position:relative;background:#fff;border-radius:18px 18px 18px 4px;
-  padding:clamp(16px,2vw,24px);font-size:clamp(15px,1.55vw,20px);line-height:1.6;
-  box-shadow:0 6px 20px rgba(40,60,40,.10);
-}
+.quote{background:#fff;border-radius:18px 18px 18px 4px;padding:clamp(16px,2vw,24px);font-size:clamp(15px,1.55vw,20px);line-height:1.6;box-shadow:0 6px 20px rgba(40,60,40,.10)}
 .quote span{display:block;margin-top:10px;font-size:.72em;font-weight:700;color:var(--ink-soft)}
-
-/* 흐름 (3단계) */
-.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:clamp(8px,1.2vw,16px)}
-.flow .step{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:clamp(14px,2vw,24px)}
-.flow .step b{display:block;font-size:clamp(15px,1.5vw,20px);margin-bottom:8px}
-.flow .step p{font-size:clamp(13px,1.28vw,16px);color:var(--ink-soft);line-height:1.6}
-.flow .arw{align-self:center;font-size:clamp(18px,2vw,26px);color:var(--ink-soft)}
 
 /* 숫자 배지 */
 .counts{display:flex;flex-wrap:wrap;gap:clamp(10px,1.4vw,18px)}
@@ -174,53 +141,61 @@ h2 em::after{
 .count b{display:block;font-family:'Gowun Batang',serif;font-size:clamp(22px,2.7vw,36px);line-height:1.1}
 .count span{font-size:clamp(11.5px,1.05vw,13.5px);color:var(--ink-soft);font-weight:600}
 
+/* 비교표 */
+.cmp{display:grid;grid-template-columns:minmax(88px,.62fr) 1fr 1.18fr;border-top:2px solid var(--ink)}
+.cmp > div{padding:clamp(10px,1.5vh,17px) clamp(9px,1.1vw,16px);border-bottom:1px solid var(--line);font-size:clamp(12.5px,1.26vw,16.5px);line-height:1.5}
+.cmp .ch{font-size:clamp(11px,1.05vw,13.5px);font-weight:800;letter-spacing:.12em;color:var(--ink-soft);padding-bottom:9px}
+.cmp .ch.us{color:var(--ink)}
+.cmp .cl{font-weight:800}
+.cmp .co{color:var(--ink-soft);opacity:.78}
+.cmp .cn{font-weight:700;background:rgba(247,197,49,.2)}
+
 /* 전화번호 */
 .tels{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,1.6vw,20px)}
-.tel{background:#fff;border-radius:18px;padding:clamp(16px,2.1vw,26px);box-shadow:0 6px 20px rgba(40,60,40,.10)}
-.tel b{font-family:'Gowun Batang',serif;font-size:clamp(30px,4vw,54px);line-height:1;display:block}
-.tel span{display:block;margin-top:10px;font-size:clamp(12.5px,1.2vw,15.5px);font-weight:600;color:var(--ink-soft)}
+.tel{background:#fff;border-radius:18px;padding:clamp(15px,2vw,24px);box-shadow:0 6px 20px rgba(40,60,40,.10)}
+.tel b{font-family:'Gowun Batang',serif;font-size:clamp(28px,3.8vw,50px);line-height:1;display:block}
+.tel span{display:block;margin-top:9px;font-size:clamp(12.5px,1.2vw,15.5px);font-weight:600;color:var(--ink-soft)}
 .tel.red b{color:var(--ribbon)}
 
-/* 마무리 */
-.final{font-family:'Gowun Batang',serif;font-size:clamp(30px,5.4vw,74px);line-height:1.3;letter-spacing:-.02em}
+/* 스스로에게 물은 것 */
+.qa .card{padding:clamp(15px,2vw,25px)}
+.qa .k{font-size:clamp(14px,1.42vw,19px);font-weight:800;line-height:1.45;align-items:flex-start;margin-bottom:10px}
+.qa .k b{font-family:'Gowun Batang',serif;color:var(--ribbon);font-size:1.55em;line-height:.85;flex:0 0 auto}
+.qa .v{font-size:clamp(13px,1.26vw,16.5px);line-height:1.62}
 
-/* ---------- 화면 우하단 표시 ---------- */
-#counter{
-  position:fixed;right:clamp(16px,2.4vw,34px);top:clamp(16px,2.4vh,30px);z-index:5;
-  font-size:clamp(12px,1.1vw,15px);font-weight:700;letter-spacing:.1em;color:var(--ink);opacity:.55;
-}
-#hint{
-  position:fixed;left:clamp(16px,2.4vw,34px);top:clamp(16px,2.4vh,30px);z-index:5;
-  font-size:clamp(11px,1vw,13px);color:var(--ink);opacity:.4;transition:opacity .4s;
-}
+/* 마무리 */
+.final{font-family:'Gowun Batang',serif;font-size:clamp(29px,5.2vw,72px);line-height:1.3;letter-spacing:-.02em}
+
+/* ---------- 화면 표시 ---------- */
+#counter{position:fixed;right:clamp(16px,2.4vw,34px);top:clamp(16px,2.4vh,30px);z-index:5;font-size:clamp(12px,1.1vw,15px);font-weight:700;letter-spacing:.1em;color:var(--ink);opacity:.55}
+#hint{position:fixed;left:clamp(16px,2.4vw,34px);top:clamp(16px,2.4vh,30px);z-index:5;font-size:clamp(11px,1vw,13px);color:var(--ink);opacity:.4;transition:opacity .4s}
 #hint.hide{opacity:0}
 
 @media (max-width:820px){
   .stats,.tels,.quotes,.c3,.c2{grid-template-columns:1fr}
-  .flow{grid-template-columns:1fr}
-  .flow .arw{transform:rotate(90deg);justify-self:center}
+  .cmp{grid-template-columns:1fr 1fr}
+  .cmp .cl{grid-column:1 / -1;border-bottom:none;padding-bottom:0}
+  .cmp .ch{display:none}
 }
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition:none!important}
-}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body data-mood="day">
 
 <div id="hint">← → 방향키로 넘기기 · F 전체화면</div>
-<div id="counter"><b id="cNow">01</b> / <span id="cAll">12</span></div>
+<div id="counter"><b id="cNow">01</b> / <span id="cAll">13</span></div>
 
 <!-- ===================== 1. 표지 ===================== -->
 <section class="slide" data-mood="day">
   <div class="wrap">
     <div class="rise"><span class="cover-team">🐣 CORE팀</span></div>
     <h1 class="rise mt-m">숲속 병아리</h1>
-    <p class="cover-sub rise">혼자 버티는 대신, 오늘 하루를 기록하는 청소년 정신건강 웹 서비스</p>
-    <p class="cover-line rise">“혼자 견디지 않아도 괜찮아요.”</p>
+    <p class="cover-sub rise">혼자 참는 대신 하루 한 줄, 매일의 마음을 기록하는 청소년 정신건강 웹 서비스</p>
+    <p class="cover-line rise">“오늘 나는 어땠지?” — 이 질문 하나로 시작합니다.</p>
   </div>
 </section>
 
-<!-- ===================== 2. 문제 ① 숫자 ===================== -->
+<!-- ===================== 2. 문제 ① ===================== -->
 <section class="slide" data-mood="dawn">
   <div class="wrap">
     <p class="eyebrow rise">우리가 본 문제</p>
@@ -245,18 +220,18 @@ h2 em::after{
   </div>
 </section>
 
-<!-- ===================== 3. 문제 ② 장벽 ===================== -->
+<!-- ===================== 3. 문제 ② ===================== -->
 <section class="slide" data-mood="dawn">
   <div class="wrap">
     <p class="eyebrow rise">진짜 문제</p>
-    <h2 class="rise">힘든 사람은 많은데,<br><em>도움을 요청하는 사람은 적습니다.</em></h2>
+    <h2 class="rise">힘든 건 아는데,<br><em>내 마음이 어떤지는 모른 채</em> 하루가 지나갑니다.</h2>
     <div class="quotes rise mt-l">
       <div class="quote">“부모님이 걱정하실까 봐 말을 못 꺼내겠어요.”<span>가족에게</span></div>
-      <div class="quote">“선생님한테 말하면 학교에 소문날 것 같아요.”<span>교사에게</span></div>
       <div class="quote">“상담실에 들어가는 걸 누가 볼까 봐 무서워요.”<span>학교 상담실</span></div>
-      <div class="quote">“정신과 기록이 남으면 어떡하지 싶어서요.”<span>병원</span></div>
+      <div class="quote">“그냥 계속 짜증이 나는데 왜인지는 모르겠어요.”<span>자기 자신에게</span></div>
+      <div class="quote">“괜찮냐고 물으면 그냥 괜찮다고 해요.”<span>친구에게</span></div>
     </div>
-    <p class="sub rise mt-m">도움을 받는 문턱이 너무 높습니다. 그래서 우리는 <b>가장 낮은 문턱</b>부터 만들기로 했습니다.</p>
+    <p class="sub rise mt-m">누구에게 말하기 전에 먼저 필요한 건 <b>내 상태를 내가 아는 것</b>입니다. 그래서 저희는 상담이 아니라 <b>기록</b>에서 시작했습니다.</p>
   </div>
 </section>
 
@@ -264,107 +239,115 @@ h2 em::after{
 <section class="slide" data-mood="day">
   <div class="wrap">
     <p class="eyebrow rise">우리의 답</p>
-    <h2 class="rise">전문 상담을 <em>대신하지 않습니다.</em><br>전문 상담까지 <em>데려다 줍니다.</em></h2>
-    <div class="flow rise mt-l">
-      <div class="step"><b>① 부담 없이 연다</b><p>로그인하면 병아리 한 마리와 오늘 하루뿐. 진단도, 설문도, 어른도 없습니다.</p></div>
-      <div class="arw">→</div>
-      <div class="step"><b>② 매일 돌아온다</b><p>하루 3가지 작은 일과 병아리 꾸미기로, 내 감정 기록이 저절로 쌓입니다.</p></div>
-      <div class="arw">→</div>
-      <div class="step"><b>③ 필요할 때 잇는다</b><p>화면 어디에서든 한 번만 누르면 24시간 무료 상담 기관으로 바로 연결됩니다.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ===================== 5. 한눈에 보기 ===================== -->
-<section class="slide" data-mood="day">
-  <div class="wrap">
-    <p class="eyebrow rise">서비스 한눈에 보기</p>
-    <h2 class="rise">하루 3가지를 끝내면, <em>병아리 옷 한 벌</em>이 열립니다.</h2>
-    <div class="cards c3 rise mt-l">
-      <div class="card"><div class="k">✏️ 오늘 기록</div><div class="v">오늘의 감정을 고르고, 오늘의 질문에 한 줄 답합니다.</div></div>
+    <h2 class="rise">말하지 않아도 되는 <em>기록부터</em> 시작합니다.</h2>
+    <p class="lead rise mt-s">털어놓을 상대도, 용기도 필요 없습니다. 하루에 세 가지, 다 해도 3분이면 끝나는 일로 내 마음이 저절로 기록됩니다.</p>
+    <div class="cards c3 rise mt-m">
+      <div class="card"><div class="k">✏️ 오늘 기록</div><div class="v">오늘의 감정을 고르고, 오늘의 질문에 한 줄 답합니다. <b>이것이 이 서비스의 중심입니다.</b></div></div>
       <div class="card"><div class="k">📣 응원 한마디</div><div class="v">내 동네 게시판에 익명으로 응원 글을 남깁니다.</div></div>
       <div class="card"><div class="k">🌱 오늘의 미션</div><div class="v">물 한 잔, 10분 걷기처럼 아주 작은 일 하나를 합니다.</div></div>
     </div>
-    <p class="sub rise mt-m">3가지를 모두 끝낸 날에만 옷이 하루 한 벌씩 열립니다. <b>총 30벌 = 30일의 기록</b> — 꾸미고 싶어서 오늘도 열게 만드는 구조입니다.</p>
+    <p class="sub rise mt-m">셋을 다 끝낸 날에만 <b>병아리 옷이 하루 한 벌</b> 열립니다. 옷장을 다 채우면 그건 <b>30일치 기록</b>이 쌓였다는 뜻입니다.</p>
   </div>
 </section>
 
-<!-- ===================== 6. 기능 1 ===================== -->
+<!-- ===================== 5. 핵심 기능 · 감정 기록 ===================== -->
 <section class="slide" data-mood="day">
   <div class="wrap">
-    <p class="eyebrow rise">기능 01 · 감정 기록</p>
-    <h2 class="rise">고르는 데 <em>3초</em>,<br>쓰는 건 <em>한 줄</em>이면 충분합니다.</h2>
-    <div class="cards c2 rise mt-m">
-      <div class="card"><div class="k">😌 감정 고르기</div><div class="v">‘좋음/나쁨’ 대신 28가지 감정 중에서 고릅니다. 억울해요·멍해요처럼, 이름을 붙일수록 감정은 다루기 쉬워집니다.</div></div>
-      <div class="card"><div class="k">🐣 오늘의 질문</div><div class="v">병아리를 누르면 날마다 다른 질문이 옵니다. “오늘 나를 웃게 만든 것은 무엇이었나요?” — 답도 그날 기록에 함께 저장됩니다.</div></div>
-    </div>
-    <div class="counts rise mt-m">
-      <div class="count"><b>28</b><span>감정</span></div>
-      <div class="count"><b>15</b><span>오늘의 질문</span></div>
-      <div class="count"><b>달력</b><span>지난 기록 다시 보기</span></div>
+    <p class="eyebrow rise">핵심 기능 · 감정 기록</p>
+    <h2 class="rise">고르는 데 <em>3초</em>, 쓰는 건 <em>한 줄</em>.<br>그게 30일 쌓이면 내 감정 지도가 됩니다.</h2>
+    <div class="cards c3 rise mt-m">
+      <div class="card"><div class="k">😌 28가지 감정</div><div class="v">‘좋음/나쁨’이 아니라 억울해요·멍해요·허전해요까지. 이름을 정확히 붙일수록 감정은 다루기 쉬워집니다.</div></div>
+      <div class="card"><div class="k">🐣 오늘의 질문</div><div class="v">병아리를 누르면 날마다 다른 질문이 옵니다. “오늘 나를 웃게 만든 것은?” — 답도 그날 기록에 함께 저장됩니다.</div></div>
+      <div class="card"><div class="k">📅 기록 달력</div><div class="v">지난 날짜를 누르면 그날의 감정과 답이 그대로 나옵니다. 언제부터 힘들었는지가 눈에 보입니다.</div></div>
     </div>
     <p class="note rise mt-s">근거 · 자신의 감정과 경험을 글로 쓰는 ‘표현적 글쓰기’가 스트레스 완화와 자기 이해에 도움이 된다는 제임스 페니베이커의 연구.</p>
   </div>
 </section>
 
-<!-- ===================== 7. 기능 2 ===================== -->
+<!-- ===================== 6. 오늘의 추천 ===================== -->
 <section class="slide" data-mood="day">
   <div class="wrap">
-    <p class="eyebrow rise">기능 02 · 오늘의 추천</p>
-    <h2 class="rise">오늘 마음에 맞는 <em>노래 한 곡과 책 한 권.</em></h2>
-    <p class="lead rise mt-s">그날 고른 감정을 다섯 갈래(밝음·잔잔·불안·답답·가라앉음)로 읽고, 그 마음에 어울리는 곡과 책을 하루에 하나씩 골라 줍니다. 최근에 나온 추천은 다시 나오지 않습니다.</p>
+    <p class="eyebrow rise">기록이 만드는 것 · 오늘의 추천</p>
+    <h2 class="rise">쓰고 나면 <em>오늘의 노래와 책</em>이 돌아옵니다.</h2>
+    <p class="lead rise mt-s">기록은 사라지지 않고 그날의 답례로 돌아옵니다. 고른 감정을 다섯 갈래(밝음·잔잔·불안·답답·가라앉음)로 읽고, 그 마음에 어울리는 곡과 책을 하나씩 골라 줍니다. 최근에 나온 추천은 다시 나오지 않습니다.</p>
     <div class="counts rise mt-m">
       <div class="count"><b>99</b><span>수록 곡</span></div>
       <div class="count"><b>67</b><span>수록 도서</span></div>
       <div class="count"><b>5</b><span>마음 갈래</span></div>
     </div>
-    <div class="cards c2 rise mt-m">
-      <div class="card"><div class="k">🎧 노래</div><div class="v">왜 오늘 이 곡인지 한 줄 소개와 함께. 광고 없이 소개만 보여 주고, 듣고 싶으면 링크로 나갑니다.</div></div>
-      <div class="card"><div class="k">📖 책</div><div class="v">줄거리 대신 “지금 이 마음일 때 곁에 두기 좋은 이유”와 문장 한 줄을 보여 줍니다.</div></div>
-    </div>
+    <p class="sub rise mt-m">책은 줄거리 대신 <b>“지금 이 마음일 때 곁에 두기 좋은 이유”와 문장 한 줄</b>을 보여 줍니다. 기록해야만 볼 수 있으니, 추천이 다시 기록을 부릅니다.</p>
   </div>
 </section>
 
-<!-- ===================== 8. 기능 3 ===================== -->
+<!-- ===================== 7. 미션과 병아리 ===================== -->
 <section class="slide" data-mood="day">
   <div class="wrap">
-    <p class="eyebrow rise">기능 03 · 미션과 병아리</p>
+    <p class="eyebrow rise">계속 쓰게 만드는 것 · 미션과 병아리</p>
     <h2 class="rise">방 안에 있어도 <em>바깥 날씨를 알게</em> 만듭니다.</h2>
     <div class="cards c3 rise mt-m">
-      <div class="card"><div class="k">🌱 26가지 미션</div><div class="v">‘물 한 잔 천천히 마시기’, ‘창문 열고 3분 바깥 공기 마시기’. 마음에 안 들면 다른 미션으로 바꿀 수 있습니다.</div></div>
-      <div class="card"><div class="k">🌦️ 실시간 제주 날씨</div><div class="v">배경 숲은 오늘 제주의 계절과 날씨 그대로. 눈이 오면 화면에도 눈이 옵니다.</div></div>
-      <div class="card"><div class="k">🎵 계절 배경음</div><div class="v">계절마다 다른 잔잔한 소리가 흐릅니다. 음원 파일 없이 브라우저가 직접 만들어 냅니다.</div></div>
+      <div class="card"><div class="k">🌱 26가지 미션</div><div class="v">‘물 한 잔 천천히 마시기’, ‘창문 열고 3분 바깥 공기 마시기’. 버거우면 다른 미션으로 바꿀 수 있습니다.</div></div>
+      <div class="card"><div class="k">🌦️ 실시간 제주 날씨</div><div class="v">배경 숲은 오늘 제주의 계절과 날씨 그대로. 제주에 비가 오면 화면에도 비가 옵니다.</div></div>
+      <div class="card"><div class="k">👕 옷 30벌</div><div class="v">하루 세 가지를 다 한 날에만 한 벌. 몰아서 열 수 없으니 매일 돌아오게 됩니다.</div></div>
     </div>
-    <p class="sub rise mt-m">움직일 힘이 없는 날에도, 창밖이 맑다는 걸 알게 되는 것부터가 시작이라고 봤습니다. 미션은 <b>부담 없는 크기</b>로만 설계했습니다.</p>
+    <p class="sub rise mt-m">움직일 힘이 없는 날에도 창밖이 맑다는 걸 알게 되는 것부터가 시작이라고 봤습니다. 계절마다 다른 잔잔한 배경음도 함께 흐릅니다.</p>
     <p class="note rise mt-s">근거 · 가벼운 신체 활동과 햇빛 노출이 우울감 완화에 도움이 된다는 WHO·대한신경정신의학회의 정신건강 권고.</p>
   </div>
 </section>
 
-<!-- ===================== 9. 기능 4 ===================== -->
+<!-- ===================== 8. 제주 지역 게시판 ===================== -->
 <section class="slide" data-mood="day">
   <div class="wrap">
-    <p class="eyebrow rise">기능 04 · 제주 지역 응원 게시판</p>
+    <p class="eyebrow rise">혼자가 아니라는 증거 · 제주 지역 게시판</p>
     <h2 class="rise">같은 동네 사람이 남긴 <em>한 줄이 먼저 와 있습니다.</em></h2>
     <p class="lead rise mt-s">실제 제주 지도 위 15개 지역을 눌러 그 동네 게시판으로 들어갑니다. 닉네임도, 프로필도, 좋아요 수도 없습니다. 남기는 것은 오직 응원 한 줄뿐입니다.</p>
     <div class="rise mt-m">
-      <span class="chip">제주시내</span><span class="chip">애월</span><span class="chip">한림</span><span class="chip">대정</span><span class="chip">중문</span><span class="chip">서귀포시내</span><span class="chip">남원</span><span class="chip">표선</span><span class="chip">성산</span><span class="chip">구좌</span><span class="chip">조천</span><span class="chip">우도</span><span class="chip">추자</span><span class="chip">외 2곳</span>
+      <span class="chip">제주시내</span><span class="chip">애월</span><span class="chip">한림</span><span class="chip">한경</span><span class="chip">대정</span><span class="chip">안덕</span><span class="chip">중문</span><span class="chip">서귀포시내</span><span class="chip">남원</span><span class="chip">표선</span><span class="chip">성산</span><span class="chip">구좌</span><span class="chip">조천</span><span class="chip">우도</span><span class="chip">추자</span>
     </div>
-    <p class="sub rise mt-s">SNS가 아니라 <b>서로를 응원하기만 하는 공간</b>입니다. 비교할 것이 없으니 상처받을 일도 없습니다.</p>
+    <p class="sub rise mt-s">전국 익명 커뮤니티와 다릅니다. <b>내가 아는 지명 아래에서 오는 응원</b>이라 훨씬 가깝게 읽히고, 비교할 것이 없으니 상처받을 일도 없습니다.</p>
   </div>
 </section>
 
-<!-- ===================== 10. 기능 5 ===================== -->
+<!-- ===================== 9. 차별점 ===================== -->
 <section class="slide" data-mood="day">
   <div class="wrap">
-    <p class="eyebrow rise">기능 05 · 상담 연계</p>
-    <h2 class="rise">가장 중요한 버튼은 <em>화면에 늘 떠 있습니다.</em></h2>
-    <p class="lead rise mt-s">💚 <b>도움이 필요하신가요?</b> — 어느 화면에서든 이 버튼 하나면 무료·비밀보장 상담으로 바로 연결됩니다.</p>
-    <div class="tels rise mt-m">
-      <div class="tel"><b>1388</b><span>청소년전화 · 24시간<br>전화가 어려우면 문자·채팅도 가능</span></div>
-      <div class="tel red"><b>109</b><span>자살예방 상담전화 · 24시간<br>(기존 1393 등이 109로 통합)</span></div>
-      <div class="tel"><b>제주</b><span>청소년상담복지센터·정신건강복지센터<br>주소·전화·홈페이지까지 바로</span></div>
+    <p class="eyebrow rise">다른 앱과 무엇이 다른가</p>
+    <h2 class="rise">진단하지 않고, <em>제주에서만 가능한 방식</em>으로 만들었습니다.</h2>
+    <div class="cmp rise mt-m">
+      <div class="ch"></div>
+      <div class="ch">보통의 정신건강 앱</div>
+      <div class="ch us">숲속 병아리</div>
+
+      <div class="cl">시작하는 법</div>
+      <div class="co">자가진단 설문부터 — 점수와 등급이 먼저</div>
+      <div class="cn">감정 하나 고르기 3초 — 진단도 점수도 없음</div>
+
+      <div class="cl">계속 쓰는 힘</div>
+      <div class="co">알림과 연속 기록 숫자, 끊기면 그만둠</div>
+      <div class="cn">병아리 옷 30벌 = 30일의 기록, 꾸미고 싶어서 열게 됨</div>
+
+      <div class="cl">곁에 있는 사람</div>
+      <div class="co">없거나, 전국 단위 익명 커뮤니티</div>
+      <div class="cn">제주 15개 지역별 응원 게시판 — 우리 동네에서 오는 한 줄</div>
+
+      <div class="cl">보이는 화면</div>
+      <div class="co">흰 배경의 입력 폼</div>
+      <div class="cn">오늘 제주 날씨가 그대로 반영된 숲</div>
     </div>
-    <p class="sub rise mt-m">앱 안에도 이렇게 적어 두었습니다. — <b>“이 앱은 상담을 대신하지 않아요. 힘들 땐 꼭 어른이나 전문가에게 이야기해 주세요.”</b></p>
+  </div>
+</section>
+
+<!-- ===================== 10. 안전장치 ===================== -->
+<section class="slide" data-mood="day">
+  <div class="wrap">
+    <p class="eyebrow rise">안전장치</p>
+    <h2 class="rise">그래도 힘든 날엔, <em>버튼 하나</em>로 어른에게.</h2>
+    <p class="lead rise mt-s">기록을 하다 보면 자기 상태가 보입니다. 그때 도움을 청할 곳이 손가락 한 번 거리에 있도록, 💚 <b>도움이 필요하신가요?</b> 버튼을 모든 화면에 띄워 뒀습니다.</p>
+    <div class="tels rise mt-m">
+      <div class="tel"><b>1388</b><span>청소년전화 · 24시간<br>문자·채팅 상담도 가능</span></div>
+      <div class="tel red"><b>109</b><span>자살예방 상담전화 · 24시간</span></div>
+      <div class="tel"><b>제주</b><span>청소년상담복지센터·정신건강복지센터<br>전화·주소·홈페이지까지</span></div>
+    </div>
+    <p class="sub rise mt-s">앱 안에도 이렇게 적어 두었습니다 — <b>“이 앱은 상담을 대신하지 않아요.”</b></p>
   </div>
 </section>
 
@@ -372,9 +355,9 @@ h2 em::after{
 <section class="slide" data-mood="day">
   <div class="wrap">
     <p class="eyebrow rise">어떻게 만들었나</p>
-    <h2 class="rise">설치 없이, <em>링크 하나로</em> 지금 바로 씁니다.</h2>
+    <h2 class="rise">설치 없이, <em>링크 하나로</em> 지금 바로.</h2>
     <div class="cards c3 rise mt-m">
-      <div class="card"><div class="k">🗂️ HTML 파일 하나</div><div class="v">화면·병아리·옷 30벌 모두 SVG로 직접 그렸습니다. 앱 설치도, 계정 연동도 없습니다.</div></div>
+      <div class="card"><div class="k">🗂️ HTML 파일 하나</div><div class="v">숲도, 병아리도, 옷 30벌도 전부 SVG로 직접 그렸습니다. 앱 설치도 계정 연동도 없습니다.</div></div>
       <div class="card"><div class="k">🔒 Apps Script + 스프레드시트</div><div class="v">아이디로 로그인하면 기록은 내 시트에만 저장됩니다. 게시판만 모두가 함께 봅니다.</div></div>
       <div class="card"><div class="k">🌍 공개 API 연결</div><div class="v">Open-Meteo로 제주 실시간 날씨, Leaflet으로 실제 제주 지도를 불러옵니다.</div></div>
     </div>
@@ -382,12 +365,34 @@ h2 em::after{
   </div>
 </section>
 
-<!-- ===================== 12. 마무리 ===================== -->
+<!-- ===================== 12. 스스로에게 물은 것 ===================== -->
+<section class="slide" data-mood="day">
+  <div class="wrap">
+    <p class="eyebrow rise">만들면서 스스로에게 물은 것</p>
+    <h2 class="rise">이 세 가지를 <em>계속 되물으면서</em> 만들었습니다.</h2>
+    <div class="cards c3 qa rise mt-m">
+      <div class="card">
+        <div class="k"><b>“</b>세상에 있는 앱을 하나 더 얹는 건 아닐까?”</div>
+        <div class="v">그래서 진단으로 시작하지 않기로 했습니다. 감정 하나 고르는 기록에서 시작하고, 제주의 날씨·지도·지역 게시판 위에서 돌아갑니다. 이건 다른 지역 앱을 그대로 가져다 쓸 수 없는 방식입니다.</div>
+      </div>
+      <div class="card">
+        <div class="k"><b>“</b>우리라면 이걸 내일 또 열까?”</div>
+        <div class="v">솔직히 기록만으로는 안 열 것 같았습니다. 그래서 병아리와 옷 30벌을 붙였습니다. 하루 세 가지를 다 해야 한 벌이고, 몰아서 열 수는 없게 했습니다.</div>
+      </div>
+      <div class="card">
+        <div class="k"><b>“</b>우리는 이 앱에 우리 마음을 쓸 수 있을까?”</div>
+        <div class="v">그러려면 최소한만 받아야 했습니다. 아이디와 비밀번호만 받고 이름·학교·연락처는 받지 않습니다. 기록은 사용자별 시트에 따로 저장됩니다.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== 13. 마무리 ===================== -->
 <section class="slide" data-mood="dusk">
   <div class="wrap">
     <p class="eyebrow rise">마무리</p>
-    <p class="final rise">혼자 참는 대신 기록하고,<br>작은 것 하나를 해내고,<br>서로 응원하다가,<br>필요할 땐 어른에게 닿는 것.</p>
-    <p class="lead rise mt-m">그 하루하루가 쌓이면 병아리는 옷을 갈아입고, 우리는 그 아이가 상담실 문 앞까지 걸어가 있기를 바랍니다.</p>
+    <p class="final rise">혼자 참는 대신 오늘을 한 줄 남기고,<br>작은 것 하나를 해내고,<br>같은 동네 사람과 응원을 주고받는 것.</p>
+    <p class="lead rise mt-m">그 하루가 서른 번 쌓이면 병아리는 옷을 다 갈아입고, 그 아이 손에는 자기 마음의 기록 30일치가 남습니다. 저희가 만들고 싶었던 건 그 기록입니다.</p>
     <div class="rise mt-l"><span class="cover-team">🐣 CORE팀 · 숲속 병아리</span></div>
   </div>
 </section>
@@ -423,7 +428,7 @@ h2 em::after{
   document.getElementById('cAll').textContent = String(slides.length).padStart(2,'0');
   let i = 0;
 
-  function show(n, dir){
+  function show(n){
     n = Math.max(0, Math.min(slides.length - 1, n));
     if(n === i && slides[i].classList.contains('on')) return;
     slides.forEach(s => s.classList.remove('on'));
@@ -432,7 +437,6 @@ h2 em::after{
     s.classList.add('on');
     document.body.dataset.mood = s.dataset.mood || 'day';
     cNow.textContent = String(i + 1).padStart(2, '0');
-    // 병아리가 슬라이드 진행만큼 언덕을 걸어간다
     const p = slides.length > 1 ? i / (slides.length - 1) : 0;
     walker.style.setProperty('--p', (5 + p * 90) + '%');
     walker.classList.remove('hopping');
